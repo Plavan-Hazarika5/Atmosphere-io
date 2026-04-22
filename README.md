@@ -1,54 +1,32 @@
-# Weather & Mood UI
+# Atmosphere.io
 
-A standalone React app that combines live weather data with a mood-driven interface.
+A modern weather experience that transforms live forecast data into mood-driven visuals, with dynamic theming, animated feedback, and a clean mobile-first interface.
 
-**Status:** v1.0 release candidate  
-**Live Demo:** _add your Vercel URL here_  
-**Repository:** _add your GitHub URL here_
+**Status:** v1.0  
+**Live Demo:** https://atmosphere-io.vercel.app/  
+**Repository:** https://github.com/Plavan-Hazarika5/Atmosphere-io
 
 ## Features
 
-- City search with Open-Meteo geocoding
-- Current weather details with condition-to-mood mapping
-- Dynamic theme glow and animated particle background
-- 5-day forecast cards
-- Celsius/Fahrenheit toggle
-- Saved recent cities using localStorage
-- "Use My Location" geolocation support
+- Live city search using Open-Meteo geocoding
+- Current weather with condition-to-mood mapping
+- Mood-based dynamic background and glow
+- "Use My Location" weather detection
+- Saved recent cities with localStorage
+- 5-day forecast overview
+- Celsius/Fahrenheit unit toggle
+- Responsive design for desktop and mobile
 
-## Tech
+## Tech Stack
 
-- React + Vite
-- Open-Meteo APIs (no API key required)
+- React
+- Vite
+- Open-Meteo APIs
+- CSS animations
 
-## Run locally
+## Run Locally
 
 ```bash
 npm install
 npm run dev
 ```
-
-## Build
-
-```bash
-npm run build
-npm run preview
-```
-
-## Deploy to Vercel
-
-1. Push this project to a GitHub repository.
-2. In Vercel, click **Add New Project** and import the repo.
-3. Use defaults:
-   - Framework Preset: `Vite`
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-4. Deploy.
-
-No environment variables are required for the current Open-Meteo integration.
-
-## Portfolio checklist
-
-- Add 3 screenshots to a `screenshots/` folder
-- Add a live demo URL at the top of this README
-- Add a 30-60 second project walkthrough clip
