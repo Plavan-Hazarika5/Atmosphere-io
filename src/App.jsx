@@ -75,17 +75,20 @@ async function getLocationFromCoords(latitude, longitude) {
   const fallback = 'Your Location';
   try {
     const response = await fetch(
-      `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=en&format=json`,
+      `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&count=10&language=en&format=json`,
     );
     if (!response.ok) return fallback;
     const data = await response.json();
     if (!data.results?.length) return fallback;
-    const [match] = data.results;
+    const cityLikeMatch = data.results.find((result) => typeof result.feature_code === 'string' && result.feature_code.startsWith('PPL'));
+    const [fallbackMatch] = data.results;
+    const match = cityLikeMatch || fallbackMatch;
+    if (!match?.name) return fallback;
     return `${match.name}, ${match.country_code}`;
   } catch {
     try {
       const nominatimResponse = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=jsonv2&zoom=10`,
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=jsonv2&zoom=13`,
       );
       if (!nominatimResponse.ok) return fallback;
       const nominatimData = await nominatimResponse.json();
@@ -93,7 +96,6 @@ async function getLocationFromCoords(latitude, longitude) {
         nominatimData.address?.city
         || nominatimData.address?.town
         || nominatimData.address?.village
-        || nominatimData.address?.state
         || nominatimData.name;
       const countryCode = nominatimData.address?.country_code?.toUpperCase();
       if (!area) return fallback;
