@@ -71,14 +71,19 @@ async function getCoordinates(city) {
 }
 
 async function getLocationFromCoords(latitude, longitude) {
-  const response = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=en&format=json`,
-  );
-  if (!response.ok) return `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
-  const data = await response.json();
-  if (!data.results?.length) return `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
-  const [match] = data.results;
-  return `${match.name}, ${match.country_code}`;
+  const fallback = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+  try {
+    const response = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=en&format=json`,
+    );
+    if (!response.ok) return fallback;
+    const data = await response.json();
+    if (!data.results?.length) return fallback;
+    const [match] = data.results;
+    return `${match.name}, ${match.country_code}`;
+  } catch {
+    return fallback;
+  }
 }
 
 async function getWeather(latitude, longitude) {
@@ -166,10 +171,8 @@ function App() {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords;
-          const [label, currentWeather] = await Promise.all([
-            getLocationFromCoords(latitude, longitude),
-            getWeather(latitude, longitude),
-          ]);
+          const currentWeather = await getWeather(latitude, longitude);
+          const label = await getLocationFromCoords(latitude, longitude);
           setLocation(label);
           setQuery(label);
           setCityInput(label.split(',')[0] || label);
