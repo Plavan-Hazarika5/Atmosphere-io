@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 
 const DEFAULT_CITY = 'Guwahati';
-const SAVED_CITIES_KEY = 'weather-mood-saved-cities';
+const SAVED_CITIES_KEY = 'atmosphere-io-saved-cities';
 
 const WEATHER_CODE_MAP = {
   0: { label: 'Clear Sky', emoji: '☀️', mood: 'energetic' },
@@ -200,7 +200,7 @@ function App() {
   return (
     <main className="app-shell">
       <nav className="top-nav">
-        <p className="brand">WEATHER.MOOD</p>
+        <p className="brand">ATMOSPHERE.IO</p>
         <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">
           API: Open-Meteo
         </a>
@@ -220,9 +220,9 @@ function App() {
 
         <div className="content">
           <header>
-            <p className="eyebrow">Project 02</p>
-            <h1>Weather & Mood UI</h1>
-            <p className="subtext">Live weather with mood-based theme, animation, saved cities, and forecast.</p>
+            <p className="eyebrow">Portfolio</p>
+            <h1>Atmosphere.io</h1>
+            <p className="subtext">Live forecast data turned into mood-driven visuals, themes, saved cities, and a five-day outlook.</p>
           </header>
 
           <form onSubmit={handleSearch} className="search-row">
@@ -286,8 +286,8 @@ function App() {
       </section>
 
       <footer className="app-footer">
-        <p>Built as Project 02 for portfolio.</p>
-        <p>Live data, mood-driven UI, and geolocation support.</p>
+        <p>Atmosphere.io — portfolio weather experience.</p>
+        <p>Open-Meteo data, mood-driven UI, and geolocation.</p>
       </footer>
     </main>
   );
