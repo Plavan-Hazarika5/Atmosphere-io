@@ -44,13 +44,14 @@ const MOOD_THEME = {
 const resolveWeather = (code) => WEATHER_CODE_MAP[code] || { label: 'Unknown', emoji: '🌍', mood: 'neutral' };
 const celsiusToFahrenheit = (celsius) => Math.round((celsius * 9) / 5 + 32);
 const formatWeekday = (dateLabel) => new Date(dateLabel).toLocaleDateString('en-US', { weekday: 'short' });
+const isCoordinateLabel = (value) => /^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(value.trim());
 
 function getInitialSavedCities() {
   try {
     const raw = localStorage.getItem(SAVED_CITIES_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.filter((city) => typeof city === 'string' && !isCoordinateLabel(city)) : [];
   } catch {
     return [];
   }
@@ -71,7 +72,7 @@ async function getCoordinates(city) {
 }
 
 async function getLocationFromCoords(latitude, longitude) {
-  const fallback = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+  const fallback = 'Your Location';
   try {
     const response = await fetch(
       `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=en&format=json`,
@@ -82,7 +83,24 @@ async function getLocationFromCoords(latitude, longitude) {
     const [match] = data.results;
     return `${match.name}, ${match.country_code}`;
   } catch {
-    return fallback;
+    try {
+      const nominatimResponse = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=jsonv2&zoom=10`,
+      );
+      if (!nominatimResponse.ok) return fallback;
+      const nominatimData = await nominatimResponse.json();
+      const area =
+        nominatimData.address?.city
+        || nominatimData.address?.town
+        || nominatimData.address?.village
+        || nominatimData.address?.state
+        || nominatimData.name;
+      const countryCode = nominatimData.address?.country_code?.toUpperCase();
+      if (!area) return fallback;
+      return countryCode ? `${area}, ${countryCode}` : area;
+    } catch {
+      return fallback;
+    }
   }
 }
 
@@ -129,7 +147,7 @@ function App() {
   };
 
   const saveCity = (cityName) => {
-    if (!cityName) return;
+    if (!cityName || isCoordinateLabel(cityName)) return;
     setSavedCities((prev) => {
       const next = [cityName, ...prev.filter((city) => city.toLowerCase() !== cityName.toLowerCase())].slice(0, 6);
       localStorage.setItem(SAVED_CITIES_KEY, JSON.stringify(next));
@@ -172,7 +190,8 @@ function App() {
         try {
           const { latitude, longitude } = position.coords;
           const currentWeather = await getWeather(latitude, longitude);
-          const label = await getLocationFromCoords(latitude, longitude);
+          const resolvedLabel = await getLocationFromCoords(latitude, longitude);
+          const label = isCoordinateLabel(resolvedLabel) ? 'Your Location' : resolvedLabel;
           setLocation(label);
           setQuery(label);
           setCityInput(label.split(',')[0] || label);
